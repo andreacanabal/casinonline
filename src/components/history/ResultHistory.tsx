@@ -47,7 +47,7 @@ export default function ResultHistory({ history }: Props) {
           ))}
         </AnimatePresence>
         {history.length === 0 && (
-          <p className="text-white/30 text-xs italic">Aún no hay resultados en esta sesión simulada.</p>
+          <p className="text-white/30 text-xs italic">Aún no hay resultados en esta sesión.</p>
         )}
       </div>
 
