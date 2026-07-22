@@ -25,7 +25,7 @@ export default function UserSession() {
         onClick={() => setOpen((v) => !v)}
         className="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-full border border-graphite-border bg-graphite-light/60 hover:border-gold/40 transition-all"
       >
-        <span className="relative w-7 h-7 rounded-full bg-gold-sheen bg-[length:200%_100%] flex items-center justify-center text-[11px] font-mono font-bold text-black">
+        <span className="relative w-7 h-7 rounded-full bg-gold-sheen bg-[length:200%_100%] flex items-center justify-center text-[11px] font-body font-bold text-black">
           MV
           <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-graphite" />
         </span>
