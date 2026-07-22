@@ -1,8 +1,14 @@
 import { create } from "zustand";
 import { BetKey, BetsMap, RoundNotification, SpinPhase, SpinResult } from "@/types/roulette";
-import { STARTING_BALANCE } from "@/constants/roulette";
+import {
+  STARTING_BALANCE,
+  OUTSIDE_BET_KEYS,
+  isOutsideBetKey,
+  labelForOutsideBet,
+  WIN_PROBABILITY,
+} from "@/constants/roulette";
 import { resolveBets } from "@/utils/payouts";
-import { generateFictionalResult } from "@/utils/spinEngine";
+import { generateFictionalResult, pickGuaranteedWinningNumber, buildResult } from "@/utils/spinEngine";
 import { generateMaskedName } from "@/utils/fakeNames";
 
 export interface CommunityWinEntry {
@@ -115,8 +121,13 @@ export const useRouletteStore = create<RouletteState>((set, get) => ({
   },
 
   beginSpin: () => {
-    const result = generateFictionalResult();
-    return result;
+    const { bets } = get();
+    const hasBets = Object.keys(bets).length > 0;
+    if (hasBets && Math.random() < WIN_PROBABILITY) {
+      const winningNumber = pickGuaranteedWinningNumber(bets);
+      if (winningNumber !== null) return buildResult(winningNumber);
+    }
+    return generateFictionalResult();
   },
 
   finishSpin: (result) => {
@@ -171,17 +182,26 @@ export const useRouletteStore = create<RouletteState>((set, get) => ({
   },
 
   toggleAutoPlay: () => {
-    const { autoPlay, bets } = get();
+    const { autoPlay, bets, selectedChip } = get();
     if (!autoPlay) {
-      if (Object.keys(bets).length === 0) {
+      // Solo se conservan apuestas "de afuera" — nunca números específicos en Auto Play
+      const outsideOnly: BetsMap = {};
+      Object.entries(bets).forEach(([k, v]) => {
+        if (isOutsideBetKey(k) && v) outsideOnly[k as BetKey] = v;
+      });
+
+      let baseBets = outsideOnly;
+      if (Object.keys(baseBets).length === 0) {
+        const randomKey = OUTSIDE_BET_KEYS[Math.floor(Math.random() * OUTSIDE_BET_KEYS.length)];
+        baseBets = { [randomKey]: selectedChip };
         get().pushNotification({
           kind: "info",
-          title: "Coloca una apuesta base",
-          subtitle: "Auto Play repite la misma apuesta cada ronda",
+          title: "Auto Play iniciado",
+          subtitle: `Apostando ${labelForOutsideBet(randomKey)} automáticamente`,
         });
-        return;
       }
-      set({ autoPlay: true, autoPlayBets: { ...bets } });
+
+      set({ bets: baseBets, autoPlay: true, autoPlayBets: { ...baseBets } });
     } else {
       set({ autoPlay: false, autoPlayBets: null });
     }
