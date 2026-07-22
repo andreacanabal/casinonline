@@ -11,9 +11,8 @@ const body = Inter({ subsets: ["latin"], variable: "--font-body" });
 const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
-  title: "Noir Royale — Simulador de Ruleta Europea (Demo)",
-  description:
-    "Simulación 100% ficticia y local de una ruleta europea con fines demostrativos. Sin dinero real, sin conexión a casinos ni apuestas reales.",
+  title: "Quantum Roulette — Ruleta Europea",
+  description: "Demo interactiva de ruleta europea con fines de presentación.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
