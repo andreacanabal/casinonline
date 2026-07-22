@@ -11,6 +11,7 @@ import BettingTable from "@/components/betting/BettingTable";
 import HUD from "@/components/hud/HUD";
 import StatsPanel from "@/components/stats/StatsPanel";
 import NotificationStack from "@/components/notifications/NotificationStack";
+import CommunityFeed from "@/components/notifications/CommunityFeed";
 import Logo from "@/components/layout/Logo";
 import UserSession from "@/components/layout/UserSession";
 import { SpinResult } from "@/types/roulette";
@@ -33,6 +34,7 @@ export default function Home() {
     lastWinningKeys,
     autoPlay,
     notifications,
+    communityWins,
     setSelectedChip,
     placeBet,
     clearBets,
@@ -71,6 +73,7 @@ export default function Home() {
         {/* Columna izquierda */}
         <aside className="flex flex-col gap-4 order-2 xl:order-1">
           <ResultHistory history={history} />
+          <CommunityFeed entries={communityWins} />
           <StatsPanel history={history} />
         </aside>
 
