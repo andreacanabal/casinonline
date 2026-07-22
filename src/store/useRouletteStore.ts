@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { BetKey, BetsMap, RoundNotification, SpinPhase, SpinResult } from "@/types/roulette";
 import {
-  STARTING_BALANCE,
+  generateStartingBalance,
   OUTSIDE_BET_KEYS,
   labelForOutsideBet,
   WIN_PROBABILITY,
@@ -66,7 +66,7 @@ function randomOutsideKey(): BetKey {
 }
 
 export const useRouletteStore = create<RouletteState>((set, get) => ({
-  balance: STARTING_BALANCE,
+  balance: generateStartingBalance(),
   totalStaked: 0,
   totalProfit: 0,
   lastRoundProfit: 0,
@@ -225,7 +225,7 @@ export const useRouletteStore = create<RouletteState>((set, get) => ({
 
   resetSimulation: () =>
     set({
-      balance: STARTING_BALANCE,
+      balance: generateStartingBalance(),
       totalStaked: 0,
       totalProfit: 0,
       lastRoundProfit: 0,
