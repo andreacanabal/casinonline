@@ -118,7 +118,7 @@ export default function BettingPanel({
         </div>
         {autoPlay && (
           <p className="text-[10px] text-gold/70 text-center -mt-1">
-            Repitiendo {formatCurrency(currentBetTotal)} cada ronda · toca de nuevo para detener
+            Apostando {formatCurrency(currentBetTotal)} en un lugar al azar cada ronda · toca de nuevo para detener
           </p>
         )}
         <div className="flex justify-center">
