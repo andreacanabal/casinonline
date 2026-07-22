@@ -67,7 +67,7 @@ export default function HUD({
         tone={streak > 0 ? "win" : streak < 0 ? "loss" : "default"}
       />
       <Stat label="Rondas jugadas" value={String(roundsPlayed)} />
-      <Stat label="ROI simulado" value={formatPercent(roi)} tone={roi >= 0 ? "win" : "loss"} />
+      <Stat label="ROI" value={formatPercent(roi)} tone={roi >= 0 ? "win" : "loss"} />
       <Stat label="Tiempo jugando" value={formatDuration(elapsed)} />
     </GlassPanel>
   );
