@@ -1,9 +1,9 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { BetKey, BetsMap } from "@/types/roulette";
 import { RED_NUMBERS } from "@/constants/roulette";
 import GlassPanel from "@/components/layout/GlassPanel";
+import CasinoChip from "@/components/betting/CasinoChip";
 
 interface Props {
   bets: BetsMap;
@@ -19,13 +19,9 @@ const BOTTOM_ROW = [1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34]; // columna 1
 function ChipStack({ amount }: { amount: number }) {
   if (!amount) return null;
   return (
-    <motion.div
-      initial={{ scale: 0, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      className="absolute -top-2 -right-1 z-10 w-6 h-6 rounded-full bg-gold-sheen bg-[length:200%_100%] border border-gold-bright text-[10px] font-mono font-bold text-black flex items-center justify-center shadow-gold-glow"
-    >
-      {amount}
-    </motion.div>
+    <div className="absolute -top-2.5 -right-1.5 z-10 pointer-events-none">
+      <CasinoChip value={amount} size={24} interactive={false} />
+    </div>
   );
 }
 
@@ -54,7 +50,7 @@ export default function BettingTable({ bets, winningKeys, disabled, onPlaceBet }
     );
   };
 
-  const outsideCell = (key: BetKey, label: string, extraClass = "", span = 1) => (
+  const outsideCell = (key: BetKey, label: string, extraClass = "", span = 1, sublabel?: string) => (
     <button
       key={key}
       disabled={disabled}
@@ -64,7 +60,10 @@ export default function BettingTable({ bets, winningKeys, disabled, onPlaceBet }
         isWinning(key) ? "ring-2 ring-gold shadow-gold-glow z-10" : ""
       }`}
     >
-      {label}
+      <span className="flex flex-col items-center leading-tight gap-0.5">
+        <span>{label}</span>
+        {sublabel && <span className="text-[9px] opacity-60 normal-case tracking-normal">{sublabel}</span>}
+      </span>
       <ChipStack amount={bets[key] ?? 0} />
     </button>
   );
@@ -86,21 +85,21 @@ export default function BettingTable({ bets, winningKeys, disabled, onPlaceBet }
         </button>
 
         {TOP_ROW.map((n) => numberCell(n))}
-        {outsideCell("column-3", "2 to 1", "bg-graphite-light text-gold/80")}
+        {outsideCell("column-3", "2 a 1", "bg-graphite-light text-gold/80")}
 
         {MID_ROW.map((n) => numberCell(n))}
-        {outsideCell("column-2", "2 to 1", "bg-graphite-light text-gold/80")}
+        {outsideCell("column-2", "2 a 1", "bg-graphite-light text-gold/80")}
 
         {BOTTOM_ROW.map((n) => numberCell(n))}
-        {outsideCell("column-1", "2 to 1", "bg-graphite-light text-gold/80")}
+        {outsideCell("column-1", "2 a 1", "bg-graphite-light text-gold/80")}
       </div>
 
-      {/* Docenas */}
+      {/* Docenas — pagan 2 a 1, igual que las columnas */}
       <div className="grid gap-1 mt-1" style={{ gridTemplateColumns: "56px repeat(12, 1fr) 68px" }}>
         <div />
-        {outsideCell("dozen-1", "1ra docena", "bg-graphite-light text-white/80", 4)}
-        {outsideCell("dozen-2", "2da docena", "bg-graphite-light text-white/80", 4)}
-        {outsideCell("dozen-3", "3ra docena", "bg-graphite-light text-white/80", 4)}
+        {outsideCell("dozen-1", "1ra docena", "bg-graphite-light text-white/80", 4, "2 a 1")}
+        {outsideCell("dozen-2", "2da docena", "bg-graphite-light text-white/80", 4, "2 a 1")}
+        {outsideCell("dozen-3", "3ra docena", "bg-graphite-light text-white/80", 4, "2 a 1")}
         <div />
       </div>
 
