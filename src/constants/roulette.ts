@@ -122,14 +122,22 @@ export const CHIP_THEME: Record<number, { base: string; base2: string; edge: str
   5000: { base: "#0a0a0c", base2: "#1c1c20", edge: "#F4D06F", text: "#F4D06F" },
 };
 
-export const STARTING_BALANCE = 100000;
+const MIN_STARTING_BALANCE = 5000;
+const MAX_STARTING_BALANCE = 25000;
+
+// Saldo inicial distinto cada vez que arranca la app (entre $5,000 y $25,000),
+// redondeado a múltiplos de $500 para que se vea "limpio".
+export function generateStartingBalance(): number {
+  const value = Math.random() * (MAX_STARTING_BALANCE - MIN_STARTING_BALANCE) + MIN_STARTING_BALANCE;
+  return Math.round(value / 500) * 500;
+}
 
 // Modo "regalo": cuando una ronda tiene apuesta activa, el resultado está
 // dirigido a que gane el WIN_PROBABILITY de las veces (el resto es una
 // tirada real al azar, para que se sienta con algo de suspenso). Pensado
 // para un uso personal y consentido (canje de regalos), no para un
 // producto público de apuestas.
-export const WIN_PROBABILITY = 0.95;
+export const WIN_PROBABILITY = 0.85;
 
 // Duraciones de la ronda (ms) — puramente estéticas
 export const COUNTDOWN_SECONDS = 5;
