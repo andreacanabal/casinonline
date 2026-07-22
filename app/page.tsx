@@ -31,7 +31,6 @@ export default function Home() {
     totalStaked,
     sessionStart,
     history,
-    lastWinningKeys,
     autoPlay,
     notifications,
     communityWins,
@@ -82,7 +81,7 @@ export default function Home() {
           <div className="relative flex items-center justify-center py-4">
             <RouletteWheel phase={phase} targetResult={wheelTarget} size={520} />
           </div>
-          <BettingTable bets={bets} winningKeys={lastWinningKeys} disabled={phase !== "betting"} onPlaceBet={handlePlaceBet} />
+          <BettingTable bets={bets} disabled={phase !== "betting"} onPlaceBet={handlePlaceBet} />
         </section>
 
         {/* Columna derecha */}
