@@ -11,6 +11,8 @@ import BettingTable from "@/components/betting/BettingTable";
 import HUD from "@/components/hud/HUD";
 import StatsPanel from "@/components/stats/StatsPanel";
 import NotificationStack from "@/components/notifications/NotificationStack";
+import Logo from "@/components/layout/Logo";
+import UserSession from "@/components/layout/UserSession";
 import { SpinResult } from "@/types/roulette";
 import { BetKey } from "@/types/roulette";
 
@@ -57,19 +59,10 @@ export default function Home() {
 
   return (
     <main className="min-h-screen w-full flex flex-col">
-      {/* Barra superior: marca + disclaimer de simulación */}
+      {/* Barra superior: marca + sesión */}
       <header className="w-full px-6 py-3 flex items-center justify-between border-b border-graphite-border/70 bg-void/80 backdrop-blur-sm sticky top-0 z-40">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-gold-sheen bg-[length:200%_100%] animate-shimmer shadow-gold-glow" />
-          <div>
-            <h1 className="font-display text-lg tracking-wide text-gold leading-none">Noir Royale</h1>
-            <p className="text-[10px] text-white/40 tracking-widest uppercase">Ruleta europea — demo</p>
-          </div>
-        </div>
-        <p className="text-[11px] text-white/40 max-w-md text-right hidden md:block">
-          Simulación 100% ficticia y local con fines demostrativos. No hay dinero real, ni conexión a casinos ni apuestas
-          reales.
-        </p>
+        <Logo />
+        <UserSession />
       </header>
 
       <NotificationStack notifications={notifications} />
@@ -118,7 +111,7 @@ export default function Home() {
       </div>
 
       <footer className="text-center py-4 text-[10px] text-white/25 tracking-wide">
-        Proyecto demostrativo · lógica y resultados generados localmente · sin valor monetario real
+        Quantum Roulette · demo interactiva
       </footer>
     </main>
   );
