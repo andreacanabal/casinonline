@@ -75,7 +75,7 @@ export const useRouletteStore = create<RouletteState>((set, get) => ({
   sessionStart: Date.now(),
 
   bets: {},
-  selectedChip: 25,
+  selectedChip: 500,
 
   phase: "betting",
   countdown: 0,
