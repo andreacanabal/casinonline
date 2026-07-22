@@ -3,13 +3,13 @@ import { BetKey, BetsMap, RoundNotification, SpinPhase, SpinResult } from "@/typ
 import {
   STARTING_BALANCE,
   OUTSIDE_BET_KEYS,
-  isOutsideBetKey,
   labelForOutsideBet,
   WIN_PROBABILITY,
 } from "@/constants/roulette";
 import { resolveBets } from "@/utils/payouts";
 import { generateFictionalResult, pickGuaranteedWinningNumber, buildResult } from "@/utils/spinEngine";
 import { generateMaskedName } from "@/utils/fakeNames";
+import { formatCurrency } from "@/utils/format";
 
 export interface CommunityWinEntry {
   id: string;
@@ -38,7 +38,7 @@ interface RouletteState {
   lastResult: SpinResult | null;
   lastWinningKeys: BetKey[];
   autoPlay: boolean;
-  autoPlayBets: BetsMap | null;
+  autoPlayAmount: number | null; // monto fijo que Auto Play reapuesta cada ronda, en un lugar al azar
 
   // UI
   notifications: RoundNotification[];
@@ -61,6 +61,10 @@ interface RouletteState {
 
 const MAX_NOTIFICATIONS = 4;
 
+function randomOutsideKey(): BetKey {
+  return OUTSIDE_BET_KEYS[Math.floor(Math.random() * OUTSIDE_BET_KEYS.length)];
+}
+
 export const useRouletteStore = create<RouletteState>((set, get) => ({
   balance: STARTING_BALANCE,
   totalStaked: 0,
@@ -79,7 +83,7 @@ export const useRouletteStore = create<RouletteState>((set, get) => ({
   lastResult: null,
   lastWinningKeys: [],
   autoPlay: false,
-  autoPlayBets: null,
+  autoPlayAmount: null,
 
   notifications: [],
   communityWins: [],
@@ -184,39 +188,38 @@ export const useRouletteStore = create<RouletteState>((set, get) => ({
   toggleAutoPlay: () => {
     const { autoPlay, bets, selectedChip } = get();
     if (!autoPlay) {
-      // Solo se conservan apuestas "de afuera" — nunca números específicos en Auto Play
-      const outsideOnly: BetsMap = {};
-      Object.entries(bets).forEach(([k, v]) => {
-        if (isOutsideBetKey(k) && v) outsideOnly[k as BetKey] = v;
+      // El monto de Auto Play es el total que ya estaba apostado (ej. $3,000);
+      // si no había nada puesto, usa la ficha seleccionada como monto base.
+      const currentTotal = Object.values(bets).reduce((a: number, b) => a + (b ?? 0), 0);
+      const amount = currentTotal > 0 ? currentTotal : selectedChip;
+
+      // Arranca esta misma ronda de inmediato, en un lugar al azar del tablero (nunca un número específico)
+      const randomKey = randomOutsideKey();
+      const startingBets: BetsMap = { [randomKey]: amount };
+
+      set({ bets: startingBets, autoPlay: true, autoPlayAmount: amount });
+      get().pushNotification({
+        kind: "info",
+        title: "Auto Play activado",
+        subtitle: `${formatCurrency(amount)} en ${labelForOutsideBet(randomKey)}`,
       });
-
-      let baseBets = outsideOnly;
-      if (Object.keys(baseBets).length === 0) {
-        const randomKey = OUTSIDE_BET_KEYS[Math.floor(Math.random() * OUTSIDE_BET_KEYS.length)];
-        baseBets = { [randomKey]: selectedChip };
-        get().pushNotification({
-          kind: "info",
-          title: "Auto Play iniciado",
-          subtitle: `Apostando ${labelForOutsideBet(randomKey)} automáticamente`,
-        });
-      }
-
-      set({ bets: baseBets, autoPlay: true, autoPlayBets: { ...baseBets } });
     } else {
-      set({ autoPlay: false, autoPlayBets: null });
+      set({ autoPlay: false, autoPlayAmount: null });
     }
   },
 
+  // Se llama al inicio de cada ronda nueva mientras Auto Play está activo:
+  // reapuesta el mismo monto guardado, pero en un lugar al azar distinto cada vez.
   applyAutoPlayBets: () => {
-    const { autoPlayBets, balance } = get();
-    if (!autoPlayBets) return false;
-    const total = Object.values(autoPlayBets).reduce((a: number, b) => a + (b ?? 0), 0);
-    if (total > balance) {
-      set({ autoPlay: false, autoPlayBets: null });
+    const { autoPlayAmount, balance } = get();
+    if (!autoPlayAmount) return false;
+    if (autoPlayAmount > balance) {
+      set({ autoPlay: false, autoPlayAmount: null });
       get().pushNotification({ kind: "loss", title: "Auto Play detenido", subtitle: "Saldo insuficiente" });
       return false;
     }
-    set({ bets: { ...autoPlayBets } });
+    const randomKey = randomOutsideKey();
+    set({ bets: { [randomKey]: autoPlayAmount } });
     return true;
   },
 
@@ -236,7 +239,7 @@ export const useRouletteStore = create<RouletteState>((set, get) => ({
       lastResult: null,
       lastWinningKeys: [],
       autoPlay: false,
-      autoPlayBets: null,
+      autoPlayAmount: null,
       notifications: [],
       communityWins: [],
     }),
