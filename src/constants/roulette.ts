@@ -51,6 +51,63 @@ export function payoutForBet(key: BetKey): number {
   return BET_DEFINITIONS[key]?.payout ?? 0;
 }
 
+// Apuestas "de afuera" — nunca números específicos. Usadas por Auto Play
+// para elegir una apuesta automáticamente cuando no hay ninguna puesta.
+export const OUTSIDE_BET_KEYS: BetKey[] = [
+  "red",
+  "black",
+  "even",
+  "odd",
+  "low",
+  "high",
+  "dozen-1",
+  "dozen-2",
+  "dozen-3",
+  "column-1",
+  "column-2",
+  "column-3",
+];
+
+export function isOutsideBetKey(key: string): key is BetKey {
+  return (OUTSIDE_BET_KEYS as string[]).includes(key);
+}
+
+export function labelForOutsideBet(key: BetKey): string {
+  switch (key) {
+    case "red":
+      return "Rojo";
+    case "black":
+      return "Negro";
+    case "even":
+      return "Par";
+    case "odd":
+      return "Impar";
+    case "low":
+      return "1-18";
+    case "high":
+      return "19-36";
+    case "dozen-1":
+      return "1ra docena";
+    case "dozen-2":
+      return "2da docena";
+    case "dozen-3":
+      return "3ra docena";
+    case "column-1":
+      return "1ra columna";
+    case "column-2":
+      return "2da columna";
+    case "column-3":
+      return "3ra columna";
+    default:
+      return key;
+  }
+}
+
+// Etiqueta de proporción de pago para mostrar en la mesa (ej. "2 a 1")
+export function payoutRatioLabel(key: BetKey): string {
+  return `${payoutForBet(key)} a 1`;
+}
+
 export const CHIP_VALUES = [500, 1000, 3000, 5000] as const;
 
 export function formatChipLabel(value: number): string {
@@ -66,6 +123,13 @@ export const CHIP_THEME: Record<number, { base: string; base2: string; edge: str
 };
 
 export const STARTING_BALANCE = 100000;
+
+// Modo "regalo": cuando una ronda tiene apuesta activa, el resultado está
+// dirigido a que gane el WIN_PROBABILITY de las veces (el resto es una
+// tirada real al azar, para que se sienta con algo de suspenso). Pensado
+// para un uso personal y consentido (canje de regalos), no para un
+// producto público de apuestas.
+export const WIN_PROBABILITY = 0.95;
 
 // Duraciones de la ronda (ms) — puramente estéticas
 export const COUNTDOWN_SECONDS = 5;
