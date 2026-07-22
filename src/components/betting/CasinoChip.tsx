@@ -73,7 +73,7 @@ export default function CasinoChip({ value, size = 48, selected = false, onClick
 
       {/* Núcleo marfil con el monto */}
       <div
-        className="absolute rounded-full flex items-center justify-center font-display font-bold"
+        className="absolute rounded-full flex items-center justify-center font-mono font-bold"
         style={{
           inset: size * 0.22,
           background: "radial-gradient(circle at 35% 30%, #ffffff, #efe9d8 85%)",
