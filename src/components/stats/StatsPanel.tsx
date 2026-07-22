@@ -57,7 +57,7 @@ export default function StatsPanel({ history }: Props) {
 
   return (
     <GlassPanel className="p-4 flex flex-col gap-4">
-      <h2 className="font-display text-gold text-sm tracking-widest uppercase">Estadísticas de la simulación</h2>
+      <h2 className="font-display text-gold text-sm tracking-widest uppercase">Estadísticas</h2>
 
       {history.length === 0 ? (
         <p className="text-white/30 text-xs italic">Juega algunas rondas para ver estadísticas.</p>
