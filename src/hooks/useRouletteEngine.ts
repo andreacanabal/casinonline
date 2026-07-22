@@ -19,6 +19,7 @@ export function useRouletteEngine(onResultReady: (result: SpinResult) => void) {
   const beginSpin = useRouletteStore((s) => s.beginSpin);
   const finishSpin = useRouletteStore((s) => s.finishSpin);
   const startRound = useRouletteStore((s) => s.startRound);
+  const applyAutoPlayBets = useRouletteStore((s) => s.applyAutoPlayBets);
   const bets = useRouletteStore((s) => s.bets);
   const { play } = useSound();
 
@@ -50,13 +51,14 @@ export function useRouletteEngine(onResultReady: (result: SpinResult) => void) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
 
-  // Autoplay: si está activo y estamos en "betting" (sin apuestas nuevas del usuario), arrancar sola
+  // Auto Play: repite la misma apuesta guardada cada ronda hasta que se apague o falte saldo
   useEffect(() => {
     if (!autoPlay || phase !== "betting") return;
-    const hasBets = Object.keys(bets).length > 0;
     const t = setTimeout(() => {
-      if (hasBets) startRound();
-    }, 1400);
+      const hasBets = Object.keys(bets).length > 0;
+      const ready = hasBets || applyAutoPlayBets();
+      if (ready) startRound();
+    }, 1200);
     return () => clearTimeout(t);
-  }, [autoPlay, phase, bets, startRound]);
+  }, [autoPlay, phase, bets, startRound, applyAutoPlayBets]);
 }
