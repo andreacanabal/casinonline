@@ -7,7 +7,6 @@ import CasinoChip from "@/components/betting/CasinoChip";
 
 interface Props {
   bets: BetsMap;
-  winningKeys: BetKey[];
   disabled: boolean;
   onPlaceBet: (key: BetKey) => void;
 }
@@ -25,9 +24,7 @@ function ChipStack({ amount }: { amount: number }) {
   );
 }
 
-export default function BettingTable({ bets, winningKeys, disabled, onPlaceBet }: Props) {
-  const isWinning = (key: BetKey) => winningKeys.includes(key);
-
+export default function BettingTable({ bets, disabled, onPlaceBet }: Props) {
   const cellBase =
     "relative flex items-center justify-center select-none cursor-pointer border border-graphite-border/70 font-mono text-sm font-semibold transition-all duration-150 hover:brightness-125 active:scale-95";
 
@@ -40,9 +37,7 @@ export default function BettingTable({ bets, winningKeys, disabled, onPlaceBet }
         key={key}
         disabled={disabled}
         onClick={() => onPlaceBet(key)}
-        className={`${cellBase} ${bg} text-white rounded-sm h-10 disabled:cursor-not-allowed ${
-          isWinning(key) ? "ring-2 ring-gold shadow-gold-glow z-10" : ""
-        }`}
+        className={`${cellBase} ${bg} text-white rounded-sm h-10 disabled:cursor-not-allowed`}
       >
         {n}
         <ChipStack amount={bets[key] ?? 0} />
@@ -56,9 +51,7 @@ export default function BettingTable({ bets, winningKeys, disabled, onPlaceBet }
       disabled={disabled}
       onClick={() => onPlaceBet(key)}
       style={{ gridColumn: `span ${span} / span ${span}` }}
-      className={`${cellBase} ${extraClass} rounded-md h-11 text-xs uppercase tracking-wider disabled:cursor-not-allowed ${
-        isWinning(key) ? "ring-2 ring-gold shadow-gold-glow z-10" : ""
-      }`}
+      className={`${cellBase} ${extraClass} rounded-md h-11 text-xs uppercase tracking-wider disabled:cursor-not-allowed`}
     >
       <span className="flex flex-col items-center leading-tight gap-0.5">
         <span>{label}</span>
@@ -76,9 +69,7 @@ export default function BettingTable({ bets, winningKeys, disabled, onPlaceBet }
           disabled={disabled}
           onClick={() => onPlaceBet("number-0" as BetKey)}
           style={{ gridRow: "span 3 / span 3" }}
-          className={`${cellBase} bg-[#0E6B3C]/80 text-white rounded-sm disabled:cursor-not-allowed ${
-            isWinning("number-0" as BetKey) ? "ring-2 ring-gold shadow-gold-glow z-10" : ""
-          }`}
+          className={`${cellBase} bg-[#0E6B3C]/80 text-white rounded-sm disabled:cursor-not-allowed`}
         >
           0
           <ChipStack amount={bets["number-0" as BetKey] ?? 0} />
