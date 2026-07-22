@@ -3,6 +3,13 @@ import { BetKey, BetsMap, RoundNotification, SpinPhase, SpinResult } from "@/typ
 import { STARTING_BALANCE } from "@/constants/roulette";
 import { resolveBets } from "@/utils/payouts";
 import { generateFictionalResult } from "@/utils/spinEngine";
+import { generateMaskedName } from "@/utils/fakeNames";
+
+export interface CommunityWinEntry {
+  id: string;
+  name: string;
+  amount: number;
+}
 
 interface RouletteState {
   // Economía ficticia
@@ -25,9 +32,11 @@ interface RouletteState {
   lastResult: SpinResult | null;
   lastWinningKeys: BetKey[];
   autoPlay: boolean;
+  autoPlayBets: BetsMap | null;
 
   // UI
   notifications: RoundNotification[];
+  communityWins: CommunityWinEntry[];
 
   // Acciones
   setSelectedChip: (v: number) => void;
@@ -38,6 +47,7 @@ interface RouletteState {
   beginSpin: () => SpinResult;
   finishSpin: (result: SpinResult) => void;
   toggleAutoPlay: () => void;
+  applyAutoPlayBets: () => boolean;
   resetSimulation: () => void;
   pushNotification: (n: Omit<RoundNotification, "id">) => void;
   dismissNotification: (id: string) => void;
@@ -63,8 +73,10 @@ export const useRouletteStore = create<RouletteState>((set, get) => ({
   lastResult: null,
   lastWinningKeys: [],
   autoPlay: false,
+  autoPlayBets: null,
 
   notifications: [],
+  communityWins: [],
 
   setSelectedChip: (v) => set({ selectedChip: v }),
 
@@ -128,6 +140,14 @@ export const useRouletteStore = create<RouletteState>((set, get) => ({
       history: [result, ...history].slice(0, 40),
     });
 
+    // Actividad de la mesa: entrada de ejemplo cada vez que termina una ronda
+    const communityEntry: CommunityWinEntry = {
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      name: generateMaskedName(),
+      amount: Math.round((200 + Math.random() * 7800) / 50) * 50,
+    };
+    set({ communityWins: [communityEntry, ...get().communityWins].slice(0, 8) });
+
     if (breakdown.totalStaked > 0) {
       if (won) {
         get().pushNotification({
@@ -150,7 +170,35 @@ export const useRouletteStore = create<RouletteState>((set, get) => ({
     }, 2600);
   },
 
-  toggleAutoPlay: () => set({ autoPlay: !get().autoPlay }),
+  toggleAutoPlay: () => {
+    const { autoPlay, bets } = get();
+    if (!autoPlay) {
+      if (Object.keys(bets).length === 0) {
+        get().pushNotification({
+          kind: "info",
+          title: "Coloca una apuesta base",
+          subtitle: "Auto Play repite la misma apuesta cada ronda",
+        });
+        return;
+      }
+      set({ autoPlay: true, autoPlayBets: { ...bets } });
+    } else {
+      set({ autoPlay: false, autoPlayBets: null });
+    }
+  },
+
+  applyAutoPlayBets: () => {
+    const { autoPlayBets, balance } = get();
+    if (!autoPlayBets) return false;
+    const total = Object.values(autoPlayBets).reduce((a: number, b) => a + (b ?? 0), 0);
+    if (total > balance) {
+      set({ autoPlay: false, autoPlayBets: null });
+      get().pushNotification({ kind: "loss", title: "Auto Play detenido", subtitle: "Saldo insuficiente" });
+      return false;
+    }
+    set({ bets: { ...autoPlayBets } });
+    return true;
+  },
 
   resetSimulation: () =>
     set({
@@ -168,7 +216,9 @@ export const useRouletteStore = create<RouletteState>((set, get) => ({
       lastResult: null,
       lastWinningKeys: [],
       autoPlay: false,
+      autoPlayBets: null,
       notifications: [],
+      communityWins: [],
     }),
 
   pushNotification: (n) => {
