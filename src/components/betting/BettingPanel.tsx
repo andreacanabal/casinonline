@@ -116,19 +116,14 @@ export default function BettingPanel({
             Auto Play {autoPlay ? "ON" : "OFF"}
           </button>
         </div>
-        {autoPlay && (
-          <p className="text-[10px] text-gold/70 text-center -mt-1">
-            Apostando {formatCurrency(currentBetTotal)} en un lugar al azar cada ronda · toca de nuevo para detener
-          </p>
-        )}
         <div className="flex justify-center">
           <button
             onClick={onReset}
             title="Reiniciar todo"
             aria-label="Reiniciar todo"
-            className="w-8 h-8 rounded-full border border-graphite-border bg-graphite-light text-white/40 hover:text-gold hover:border-gold/40 flex items-center justify-center transition-all"
+            className="w-6 h-6 rounded-full text-white/15 hover:text-white/45 flex items-center justify-center transition-all"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 12a9 9 0 1 1-3-6.7" />
               <polyline points="21 3 21 9 15 9" />
             </svg>
