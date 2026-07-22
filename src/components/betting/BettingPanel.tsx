@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import GlassPanel from "@/components/layout/GlassPanel";
+import CasinoChip from "@/components/betting/CasinoChip";
 import { CHIP_VALUES } from "@/constants/roulette";
 import { SpinPhase, SpinResult } from "@/types/roulette";
 import { formatCurrency } from "@/utils/format";
@@ -74,20 +75,9 @@ export default function BettingPanel({
       {/* Selector de fichas */}
       <div>
         <p className="text-[10px] uppercase tracking-widest text-white/40 mb-2">Valor de ficha</p>
-        <div className="flex gap-2">
+        <div className="flex gap-3">
           {CHIP_VALUES.map((v) => (
-            <button
-              key={v}
-              onClick={() => onSelectChip(v)}
-              className={`relative w-12 h-12 rounded-full font-mono text-xs font-bold border-2 transition-all
-                ${
-                  selectedChip === v
-                    ? "border-gold bg-gold-sheen bg-[length:200%_100%] text-black shadow-gold-glow scale-105"
-                    : "border-graphite-border bg-graphite-light text-gold/80 hover:border-gold/50"
-                }`}
-            >
-              {v}
-            </button>
+            <CasinoChip key={v} value={v} size={52} selected={selectedChip === v} onClick={() => onSelectChip(v)} />
           ))}
         </div>
       </div>
@@ -126,12 +116,24 @@ export default function BettingPanel({
             Auto Play {autoPlay ? "ON" : "OFF"}
           </button>
         </div>
-        <button
-          onClick={onReset}
-          className="w-full py-2 rounded-xl text-[11px] uppercase tracking-wider text-white/40 hover:text-garnet-bright transition-all"
-        >
-          Reiniciar simulación completa
-        </button>
+        {autoPlay && (
+          <p className="text-[10px] text-gold/70 text-center -mt-1">
+            Repitiendo {formatCurrency(currentBetTotal)} cada ronda · toca de nuevo para detener
+          </p>
+        )}
+        <div className="flex justify-center">
+          <button
+            onClick={onReset}
+            title="Reiniciar todo"
+            aria-label="Reiniciar todo"
+            className="w-8 h-8 rounded-full border border-graphite-border bg-graphite-light text-white/40 hover:text-gold hover:border-gold/40 flex items-center justify-center transition-all"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 12a9 9 0 1 1-3-6.7" />
+              <polyline points="21 3 21 9 15 9" />
+            </svg>
+          </button>
+        </div>
       </div>
     </GlassPanel>
   );
