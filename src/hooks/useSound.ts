@@ -2,12 +2,14 @@
 
 import { useCallback, useRef } from "react";
 
-type SoundName = "chip" | "spinTick" | "countdown" | "win" | "ballDrop" | "notify";
+type SoundName = "chip" | "spinTick" | "countdown" | "win" | "ballDrop" | "notify" | "deflector";
 
 /**
  * Motor de sonido 100% sintetizado con Web Audio API.
  * No se cargan archivos de audio externos: todo se genera localmente
- * mediante osciladores, lo cual mantiene la demo autocontenida.
+ * mediante osciladores. El tick de la bola y los golpes de deflector
+ * varían de tono/volumen según la velocidad instantánea para que la
+ * mezcla se sienta dinámica en vez de repetitiva.
  */
 export function useSound() {
   const ctxRef = useRef<AudioContext | null>(null);
@@ -61,6 +63,10 @@ export function useSound() {
           tone(140, 0.25, "sine", 0.1);
           tone(90, 0.3, "sine", 0.08, 0.08);
           break;
+        case "deflector":
+          tone(1600, 0.05, "square", 0.03);
+          tone(700, 0.08, "triangle", 0.03, 0.01);
+          break;
         case "win":
           [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => tone(f, 0.3, "triangle", 0.07, i * 0.09));
           break;
@@ -72,5 +78,19 @@ export function useSound() {
     [tone]
   );
 
-  return { play };
+  /**
+   * Tick de bola en movimiento, modulado por velocidad (0 = casi detenida, 1 = velocidad máxima).
+   * Más rápido → tono más agudo y más volumen. Más lento → tono grave y suave.
+   */
+  const playTick = useCallback(
+    (speedRatio: number) => {
+      const clamped = Math.max(0, Math.min(1, speedRatio));
+      const freq = 260 + clamped * 640;
+      const gain = 0.015 + clamped * 0.05;
+      tone(freq, 0.035 + clamped * 0.02, "square", gain);
+    },
+    [tone]
+  );
+
+  return { play, playTick };
 }
