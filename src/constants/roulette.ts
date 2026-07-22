@@ -51,10 +51,22 @@ export function payoutForBet(key: BetKey): number {
   return BET_DEFINITIONS[key]?.payout ?? 0;
 }
 
-export const CHIP_VALUES = [5, 25, 100, 500] as const;
+export const CHIP_VALUES = [500, 1000, 3000, 5000] as const;
 
-export const STARTING_BALANCE = 5000;
+export function formatChipLabel(value: number): string {
+  return value >= 1000 ? `${value / 1000}K` : String(value);
+}
 
-// Duraciones de la simulación (ms) — puramente estéticas, sin relación con juego real
+// Paleta por denominación, inspirada en fichas de casino reales (cada valor tiene su propio color)
+export const CHIP_THEME: Record<number, { base: string; base2: string; edge: string; text: string }> = {
+  500: { base: "#2E2E35", base2: "#17171B", edge: "#D4AF37", text: "#F4D06F" },
+  1000: { base: "#9E1B32", base2: "#5c0f1d", edge: "#D4AF37", text: "#F4E9C9" },
+  3000: { base: "#123C55", base2: "#0a2131", edge: "#D4AF37", text: "#F4D06F" },
+  5000: { base: "#0a0a0c", base2: "#1c1c20", edge: "#F4D06F", text: "#F4D06F" },
+};
+
+export const STARTING_BALANCE = 100000;
+
+// Duraciones de la ronda (ms) — puramente estéticas
 export const COUNTDOWN_SECONDS = 5;
 export const SPIN_DURATION_MS = 5200;
